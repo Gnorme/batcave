@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <title>Bat Cave</title>
+      <meta http-equiv="content-type" content="text/html">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <style type="text/css">
+		* { -webkit-user-select:none; -webkit-tap-highlight-color:rgba(255, 255, 255, 0); -ms-touch-action:none;} 
+		body  {margin:0;padding:0;overflow:hidden;background-color:transparent;font-family:arial;}
+		canvas{background-color:#000000;overflow:hidden;}
+	</style>
+
+	<script type="text/javascript" charset="utf-8" src="intelxdk.js"></script>
+
+	<script type="text/javascript" language="javascript">
+		//This code prevents users from dragging the page 
+		var preventDefaultScroll = function(event) {
+			event.preventDefault();
+			window.scroll(0,0);
+			return false;
+		};
+		document.addEventListener('touchmove', preventDefaultScroll, false);
+	</script>
+
+
+<script type="text/javascript" language="javascript">
+	//initial event handler to detect when the AppMob object is ready 
+	document.addEventListener("intel.xdk.device.ready",function(){
+
+		//lock the device in portrait mode
+		intel.xdk.device.setRotateOrientation("portrait");
+		
+		//turn off native sensing for rotation
+		intel.xdk.device.setAutoRotate(false);
+		
+	
+		//load the AGI view layer
+		AppMobi.canvas.load("index.js");
+		//enable multi-touch for AGI on Android devices
+		try {
+			intel.xdk.multitouch.enable();
+		} catch(e) {}
+        
+
+	},false);
+		
+	
+	//this function tells AGI what the scren size is
+	function get_screen_size()
+	{
+		//update AGI view
+		AppMobi.canvas.execute("current_width=" + document.documentElement.clientWidth + ";");
+		AppMobi.canvas.execute("current_height=" + document.documentElement.clientHeight + ";");
+	}
+	
+	function start_sample() 
+	{
+		//hide the startup text
+      
+        document.getElementById("splash").style.display="none";
+        document.getElementById("bg").style.display="none";  
+        
+		AppMobi.canvas.execute('start_animation_loop();');	
+        AppMobi.canvas.execute("playerJump();");
+        document.getElementById("debugMessage").style.display="block";
+	}
+    
+	function screenClick()
+	{	
+        //var timeoutid = 500;
+        //clearTimeout(timeoutid);
+		//call the AGI view layer to make something happen
+		AppMobi.canvas.execute("playerJump();");
+        return false;
+	}
+    document.addEventListener("touchstart", screenClick, false);
+    document.addEventListener("touchend",function(){
+        AppMobi.canvas.execute("endGlide();");
+    });
+    
+</script> 
+
+   </head>
+   <body>
+       <img id="bg" src="assets/cavebg.png" />
+       <img id="splash" src="assets/splash.png" style="position:absolute;left:20%;width:60%;top:50px;" />
+       <div id="debugMessage" style="position:absolute;bottom:0px;left:0px;color:red;display:none;">DEBUG</div>
+   </body>
+    <script>
+        document.getElementById("splash").addEventListener("touchstart",function(evt){
+           start_sample();
+            evt.stopPropagation();
+        },false);
+    </script>
+</html>
